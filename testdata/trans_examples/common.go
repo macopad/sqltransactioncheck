@@ -2,7 +2,7 @@ package trans_examples
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/macopad/sqltransactioncheck/testdata/dbutil"
+	_ "github.com/macopad/sqltransactioncheck/pkg/analyzer/testdata/dbutil"
 )
 
 /*
