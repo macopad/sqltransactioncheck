@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ryanrolds/sqlclosecheck/pkg/analyzer"
+	"github.com/macopad/sqltransactioncheck/pkg/analyzer"
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 
