@@ -1,12 +1,12 @@
 package trans_examples
 
-import "github.com/macopad/sqltransactioncheck/testdata/dbutil"
+import "github.com/macopad/sqltransactioncheck/analyzer/testdata/dbutil"
 
 func testTransaction() {
 
 	tm := dbutil.NewTransaction()
 	tm.SetCommitFlag(true)
-	//tm.RollbackIfNotCommit()
+	tm.RollbackIfNotCommit()
 
 	/*
 		var tm = dbutil.NewTransaction()
