@@ -14,7 +14,7 @@ func XTestClosedAnalyzer(t *testing.T) {
 	checker := analyzer.NewClosedAnalyzer()
 
 	packages := []string{
-		"github.com/macopad/sqltransactioncheck/testdata/trans_samples",
+		"github.com/macopad/sqltransactioncheck/analyzer/pkg/testdata/trans",
 	}
 
 	for _, pkg := range packages {

@@ -14,7 +14,7 @@ func TestDeferOnlyAnalyzer(t *testing.T) {
 	checker := analyzer.NewDeferOnlyAnalyzer()
 
 	packages := []string{
-		"github.com/macopad/sqltransactioncheck/testdata/trans_samples",
+		"github.com/macopad/sqltransactioncheck/pkg/analyzer/testdata/trans",
 	}
 
 	for _, pkg := range packages {

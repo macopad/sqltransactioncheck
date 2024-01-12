@@ -14,9 +14,7 @@ func TestConfigurableAnalyzerDeferOnly(t *testing.T) {
 	checker := analyzer.NewConfigurableAnalyzer(analyzer.ConfigurableAnalyzerDeferOnly)
 
 	packages := []string{
-		"github.com/ryanrolds/sqlclosecheck/pkg/analyzer/testdata/rows",
-		"github.com/ryanrolds/sqlclosecheck/pkg/analyzer/testdata/stmt",
-		"github.com/ryanrolds/sqlclosecheck/pkg/analyzer/testdata/pgx",
+		"github.com/macopad/sqltransactioncheck/pkg/analyzer/testdata/trans",
 	}
 
 	for _, pkg := range packages {

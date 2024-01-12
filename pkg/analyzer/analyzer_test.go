@@ -14,7 +14,7 @@ func TestAnalyzer(t *testing.T) {
 	checker := analyzer.NewAnalyzer()
 
 	packages := []string{
-		"github.com/macopad/sqltransactioncheck/testdata/trans_examples",
+		"github.com/macopad/sqltransactioncheck/pkg/analyzer/testdata/trans",
 	}
 
 	for _, pkg := range packages {
