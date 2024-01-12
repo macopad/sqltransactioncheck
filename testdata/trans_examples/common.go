@@ -1,8 +1,8 @@
 package trans_examples
 
 import (
-	_ "git.garena.com/shopee/marketing/affiliate-platform/common/dbutil"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/macopad/sqltransaction/testdata/dbutil"
 )
 
 /*

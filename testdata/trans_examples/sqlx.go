@@ -1,6 +1,6 @@
 package trans_examples
 
-import "github.com/ryanrolds/sqlclosecheck/testdata/dbutil"
+import "github.com/macopad/sqltransaction/testdata/dbutil"
 
 func testTransaction1() {
 
