@@ -11,7 +11,7 @@ type action uint8
 var (
 	sqlPackages = []string{
 		//"database/sql",
-		"github.com/ryanrolds/sqlclosecheck/testdata/dbutil",
+		"github.com/macopad/sqltransactioncheck/testdata/dbutil",
 	}
 )
 
