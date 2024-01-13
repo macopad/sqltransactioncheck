@@ -1,6 +1,8 @@
 package trans_examples
 
-import "github.com/macopad/sqltransactioncheck/pkg/analyzer/testdata/dbutil"
+import (
+	"testdata/trans_examples/testdata/dbutil"
+)
 
 func testTransaction1() {
 
