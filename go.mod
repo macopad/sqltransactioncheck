@@ -1,0 +1,14 @@
+module testdata/trans_examples
+
+go 1.21.5
+
+require (
+	github.com/macopad/sqltransactioncheck v0.0.0-20240113032841-7ac88990d44c
+	golang.org/x/tools v0.17.0
+)
+
+require (
+	github.com/jinzhu/gorm v1.9.16 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	golang.org/x/mod v0.14.0 // indirect
+)

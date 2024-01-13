@@ -1,7 +1,7 @@
 package dbutil
 
 import (
-	_ "github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 var (
