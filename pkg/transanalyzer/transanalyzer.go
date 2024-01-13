@@ -131,6 +131,7 @@ func isTransactionClosed(callExpr *ast.CallExpr) bool {
 	return false
 }
 
+/*
 func isDeferTransactionClose(callExpr *ast.CallExpr) bool {
 	deferStmt, ok := getParentDeferStmt(callExpr)
 	if !ok {
@@ -166,4 +167,4 @@ func getContainingStmts(node ast.Node) []ast.Stmt {
 	}
 
 	return stmts
-}
+}*/
