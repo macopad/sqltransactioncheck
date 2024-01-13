@@ -1,20 +1,19 @@
-package transanalyzer_test
+package analyzer_test
 
 import (
-	transanalyzer "testdata/trans"
-	"testing"
-
+	"github.com/macopad/sqltransactioncheck/analyzer"
 	"golang.org/x/tools/go/analysis/analysistest"
+	"testing"
 )
 
-func TestTransanalyzer(t *testing.T) {
+func TestNewAnalyzer(t *testing.T) {
 	t.Parallel()
 
 	testdata := analysistest.TestData()
-	checker := transanalyzer.NewTransanalyzer()
+	checker := analyzer.NewAnalyzer()
 
 	packages := []string{
-		"github.com/macopad/sqltransactioncheck/pkg/transanalyzer/testdata/trans",
+		"github.com/macopad/sqltransactioncheck/pkg/analyzer/testdata/trans",
 	}
 
 	for _, pkg := range packages {

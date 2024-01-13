@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/macopad/sqltransactioncheck/pkg/transanalyzer"
+	"github.com/macopad/sqltransactioncheck/pkg/analyzer"
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 
 func main() {
-	singlechecker.Main(transanalyzer.NewTransanalyzer())
+	singlechecker.Main(analyzer.NewAnalyzer())
 }
