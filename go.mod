@@ -3,7 +3,7 @@ module testdata/trans_examples
 go 1.21.5
 
 require (
-	github.com/macopad/sqltransactioncheck v0.0.0-20240113032841-7ac88990d44c
+	github.com/macopad/sqltransactioncheck v1.0.0
 	golang.org/x/tools v0.17.0
 )
 
