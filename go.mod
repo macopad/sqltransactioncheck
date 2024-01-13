@@ -1,4 +1,4 @@
-module testdata/trans_examples
+module github.com/macopad/sqltransactioncheck
 
 go 1.21.5
 
