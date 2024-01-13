@@ -3,7 +3,7 @@ module github.com/macopad/sqltransactioncheck
 go 1.21.5
 
 require (
-	github.com/macopad/sqltransactioncheck v1.0.0
+	github.com/macopad/sqltransactioncheck v3.0.0
 	golang.org/x/tools v0.17.0
 )
 
