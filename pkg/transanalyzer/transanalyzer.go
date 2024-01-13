@@ -1,4 +1,4 @@
-package analyzer
+package transanalyzer
 
 import (
 	"go/ast"
@@ -9,7 +9,7 @@ import (
 
 // NewAnalyzer returns a non-configurable analyzer that defaults to the defer-only mode.
 // Deprecated, this will be removed in v1.0.0.
-func NewAnalyzer() *analysis.Analyzer {
+func NewTransanalyzer() *analysis.Analyzer {
 	return &analysis.Analyzer{
 		Name: "sqltransactioncheck",
 		Doc:  "Checks transaction are submit.",
