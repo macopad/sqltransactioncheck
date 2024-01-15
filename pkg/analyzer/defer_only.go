@@ -48,7 +48,7 @@ func (a *deferOnlyAnalyzer) Run(pass *analysis.Pass) (interface{}, error) {
 		})
 
 		if transaction == true && isClosed == false {
-			pass.Reportf(tempPos.Pos(), "SQL Transaction(commit|rollback) was not submit warning")
+			pass.Reportf(tempPos.Pos(), "SQL Transaction(commit|rollback) are not submit warning")
 		}
 	}
 
@@ -100,7 +100,7 @@ func isChecklist(callExpr *ast.CallExpr) bool {
 		return false
 	}
 
-	//如果不是tm或者dbMgr的类，直接忽略掉不检查
+	//如果不是tm或者dbMgr的类，直接忽略掉不检查,公司大部分都是取这个，后续这个需要改造成dbutils类可无脑检测
 	checkObjList := map[string]bool{
 		"tm":    true,
 		"dbMgr": true,
