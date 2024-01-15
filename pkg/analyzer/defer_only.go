@@ -93,26 +93,38 @@ func checkTransactionClose(pass *analysis.Pass, callExpr *ast.CallExpr) bool {
 	return true
 }
 
+func isChecklist(callExpr *ast.CallExpr) bool {
+	//排除other非tm函数
+	selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+
+	//如果不是tm或者dbMgr的类，直接忽略掉不检查
+	checkObjList := map[string]bool{
+		"tm":    true,
+		"dbMgr": true,
+	}
+
+	//初始化name为-
+	name := "-"
+	ident, ok := selectorExpr.X.(*ast.Ident)
+	if ok {
+		name = ident.Name
+	}
+
+	//如果在map内，直接忽略
+	if _, ok := checkObjList[name]; !ok {
+		return false
+	}
+	return true
+}
+
 func isTransactionClosed(callExpr *ast.CallExpr) bool {
-	/*
-		//排除other非tm函数
-		selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
-		if !ok {
-			return false
-		}
-
-		ident, ok := selectorExpr.X.(*ast.Ident)
-		//如果不是tm或者dbMgr的类，直接忽略掉不检查
-		notCheckObjList := map[string]bool{
-			"tm":    true,
-			"dbMgr": true,
-		}
-
-		//如果在map内，直接忽略
-		if notCheckObjList[ident.Name] != true {
-			return false
-		}
-	*/
+	//排除非tm|dbMgr类函数，直接忽略不检查
+	if isChecklist(callExpr) == false {
+		return false
+	}
 
 	// 检查事务关闭的常见方式
 	if isTmMethodCall(callExpr, "RollbackIfNotCommit") {
