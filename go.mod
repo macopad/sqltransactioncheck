@@ -1,6 +1,6 @@
 module github.com/macopad/sqltransactioncheck
 
-go 1.21.5
+go 1.15
 
 require (
 	github.com/macopad/sqltransactioncheck v1.0.5
