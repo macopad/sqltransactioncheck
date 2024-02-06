@@ -1,6 +1,6 @@
 module github.com/macopad/sqltransactioncheck
 
-go 1.21
+go 1.15
 
 require golang.org/x/tools v0.17.0
 
