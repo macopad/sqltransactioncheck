@@ -1,27 +1,19 @@
 package trans
 
 import (
-	"testdata/trans_examples/testdata/dbutil"
+	"github.com/macopad/sqltransactioncheck/testdata/dbutil"
 )
 
 func testTransaction() {
 
-	tm := dbutil.NewTransaction()
+	var tm dbutil.TransactionManager = nil
 	tm.SetCommitFlag(true)
 	tm.RollbackIfNotCommit()
+	//testTransaction()
+}
 
-	/*
-		var tm = dbutil.NewTransaction()
-
-		err := tm.GetConn().Exec("select 1")
-
-		if err != nil {
-			tm.SetCommitFlag(false)
-		}
-
-		tm.SetCommitFlag(true)
-		//defer tm.RollbackIfNotCommit()
-
-		fmt.Printf("data:%+v", err)
-	*/
+func testTrans2() {
+	var tm1 dbutil.TransactionManager = nil
+	tm1.SetCommitFlag(true)
+	//tm.RollbackIfNotCommit()
 }

@@ -4,34 +4,25 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var (
-	db *gorm.DB
-)
+type TransactionManager interface {
+	SetCommitFlag(flag bool)
+	RollbackIfNotCommit()
+	GetConn() *gorm.DB
+	SetConnOption(name string, value interface{}) TransactionManager
+}
 
 type TM struct {
 	tx         *gorm.DB
 	commitFlag bool
 }
 
-type TransactionManager interface {
-	SetCommitFlag(flag bool)
-	RollbackIfNotCommit()
-	GetConn() *gorm.DB
-}
+func (tm *TM) clone() *TM {
 
-func NewTransaction() TransactionManager {
-	tm := &TM{}
-	tm.tx = db.Begin()
-	tm.commitFlag = false
-	err := tm.tx.Error
-	if err != nil {
-		//
-	}
-	return tm
-}
+	ntm := &TM{}
+	ntm.tx = tm.tx
+	ntm.commitFlag = tm.commitFlag
 
-func (tm *TM) GetConn() *gorm.DB {
-	return tm.tx
+	return ntm
 }
 
 func (tm *TM) SetCommitFlag(flag bool) {
@@ -40,14 +31,78 @@ func (tm *TM) SetCommitFlag(flag bool) {
 
 func (tm *TM) RollbackIfNotCommit() {
 	if tm.commitFlag == true {
-		err := tm.tx.Commit().Error
-		if err != nil {
-			//
-		}
+		tm.tx.Commit()
 	} else {
-		err := tm.tx.Rollback().Error
-		if err != nil {
-			//
-		}
+		tm.tx.Rollback()
 	}
+}
+
+func (tm *TM) GetConn() *gorm.DB {
+	return tm.tx
+}
+
+func (tm *TM) SetConnOption(name string, value interface{}) TransactionManager {
+	ntm := tm.clone()
+	ntm.tx = ntm.tx.Set(name, value)
+	return ntm
+}
+
+type TMWithoutTrans struct {
+	tx *gorm.DB
+}
+
+func (tm *TMWithoutTrans) clone() *TMWithoutTrans {
+
+	ntm := &TMWithoutTrans{}
+	ntm.tx = tm.tx
+
+	return ntm
+}
+
+func (tm *TMWithoutTrans) SetCommitFlag(flag bool) {
+	panic("CANNOT use SetCommitFlag in TMWithoutTrans")
+}
+
+func (tm *TMWithoutTrans) RollbackIfNotCommit() {
+	panic("CANNOT use RollbackIfNotCommit in TMWithoutTrans")
+}
+
+func (tm *TMWithoutTrans) GetConn() *gorm.DB {
+	return tm.tx
+}
+
+func (tm *TMWithoutTrans) SetConnOption(name string, value interface{}) TransactionManager {
+	ntm := tm.clone()
+	ntm.tx = ntm.tx.Set(name, value)
+	return ntm
+}
+
+type TMSlave struct {
+	tx *gorm.DB
+}
+
+func (tm *TMSlave) clone() *TMSlave {
+
+	ntm := &TMSlave{}
+	ntm.tx = tm.tx
+
+	return ntm
+}
+
+func (tm *TMSlave) SetCommitFlag(flag bool) {
+	panic("CANNOT use SetCommitFlag in TMSlave")
+}
+
+func (tm *TMSlave) RollbackIfNotCommit() {
+	panic("CANNOT use RollbackIfNotCommit in TMSlave")
+}
+
+func (tm *TMSlave) GetConn() *gorm.DB {
+	return tm.tx
+}
+
+func (tm *TMSlave) SetConnOption(name string, value interface{}) TransactionManager {
+	ntm := tm.clone()
+	ntm.tx = ntm.tx.Set(name, value)
+	return ntm
 }

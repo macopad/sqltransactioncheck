@@ -1,11 +1,8 @@
 module github.com/macopad/sqltransactioncheck
 
-go 1.15
+go 1.21
 
-require (
-	github.com/macopad/sqltransactioncheck v1.0.7
-	golang.org/x/tools v0.17.0
-)
+require golang.org/x/tools v0.17.0
 
 require (
 	github.com/jinzhu/gorm v1.9.16 // indirect

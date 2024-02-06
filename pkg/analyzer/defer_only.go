@@ -2,7 +2,9 @@ package analyzer
 
 import (
 	"flag"
+	"fmt"
 	"go/ast"
+	"go/token"
 	"golang.org/x/tools/go/analysis"
 )
 
@@ -18,160 +20,71 @@ func NewDeferOnlyAnalyzer() *analysis.Analyzer {
 func (a *deferOnlyAnalyzer) Run(pass *analysis.Pass) (interface{}, error) {
 
 	for _, file := range pass.Files {
-		//定义是否开启事务
-		transaction := false
-		var tempPos ast.Node
-		//定义是否检测到事务提交
-		isClosed := false
+		//暂定检测结构体
+		var checkTransactionObj = "&{dbutil TransactionManager}"
+		var checkTransactionSubmit = "RollbackIfNotCommit"
 
-		ast.Inspect(file, func(node ast.Node) bool {
-			callExpr, ok := node.(*ast.CallExpr)
-			if !ok {
-				return true
-			}
+		// 遍历源代码文件中的所有节点
+		ast.Inspect(file, func(n ast.Node) bool {
+			//遍历函数
+			if function, ok := n.(*ast.FuncDecl); ok {
+				//fmt.Printf("函数名: %s\n", function.Name.Name)
 
-			// 检查函数调用是否是 `NewTransaction` 方法
-			if isMethodCall(callExpr, "NewTransaction") {
-				transaction = true
-				//fmt.Printf("事务开启状态： %+v \n", transaction)
+				//定义事务是否开启
+				var transaction bool = false
+				//定义事务是否提交
+				var submit bool = false
 
-				tempPos = callExpr.Fun
-				//pass.Reportf(tempPos.Pos(), "SQL Transaction start")
-			}
+				// 遍历函数内部的语句
+				ast.Inspect(function.Body, func(n ast.Node) bool {
 
-			//检查事务是否有提交
-			if checkTransactionClose(pass, callExpr) == true {
-				isClosed = true
+					// 检查变量声明语句
+					if decl, ok := n.(*ast.GenDecl); ok && decl.Tok == token.VAR {
+						for _, spec := range decl.Specs {
+							if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+								// 遍历变量声明中的每个变量
+								for _, ident := range valueSpec.Names {
+									// 临时变量
+									tempTransaction := fmt.Sprintf("%s", valueSpec.Type)
+									if tempTransaction == checkTransactionObj {
+										transaction = true
+										fmt.Sprintf("变量: %s, 类型: %s\n", ident.Name, valueSpec.Type)
+									}
+								}
+							}
+						}
+					}
+
+					// 检查函数调用表达式
+					if callExpr, ok := n.(*ast.CallExpr); ok {
+						selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
+						if !ok {
+							return false
+						}
+
+						if _, ok := selectorExpr.X.(*ast.Ident); ok {
+							// 打印函数调用的函数名称
+							//fmt.Printf("函数调用: %s\n", selectorExpr.Sel.Name)
+							if selectorExpr.Sel.Name == checkTransactionSubmit {
+								submit = true
+							}
+						}
+
+					}
+
+					return true
+				})
+
+				if transaction == true && submit == false {
+					pass.Reportf(function.Pos(), "SQL Transaction(commit|rollback) was not submit warning")
+				}
+
 			}
 
 			return true
 		})
 
-		if transaction == true && isClosed == false {
-			pass.Reportf(tempPos.Pos(), "SQL Transaction(commit|rollback) are not submit warning")
-		}
 	}
 
 	return nil, nil
 }
-
-func isMethodCall(callExpr *ast.CallExpr, methodName string) bool {
-
-	selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
-	if !ok {
-		return false
-	}
-
-	if ident, ok := selectorExpr.X.(*ast.Ident); ok && ident.Name == "dbutil" {
-		if selectorExpr.Sel.Name == methodName {
-			return true
-		}
-	}
-	return false
-}
-
-func isTmMethodCall(callExpr *ast.CallExpr, methodName string) bool {
-	selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
-	if !ok {
-		return false
-	}
-
-	ident, ok := selectorExpr.X.(*ast.Ident)
-	if ok && (ident.Name == "tm" || ident.Name == "dbMgr") {
-		if selectorExpr.Sel.Name == methodName {
-			return true
-		}
-	}
-	return false
-}
-
-func checkTransactionClose(pass *analysis.Pass, callExpr *ast.CallExpr) bool {
-	if !isTransactionClosed(callExpr) {
-		//pass.Reportf(callExpr.Pos(), "事务未正确关闭")
-		return false
-	}
-	return true
-}
-
-func isChecklist(callExpr *ast.CallExpr) bool {
-	//排除other非tm函数
-	selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
-	if !ok {
-		return false
-	}
-
-	//如果不是tm或者dbMgr的类，直接忽略掉不检查,公司大部分都是取这个，后续这个需要改造成dbutils类可无脑检测
-	checkObjList := map[string]bool{
-		"tm":    true,
-		"dbMgr": true,
-	}
-
-	//初始化name为-
-	name := "-"
-	ident, ok := selectorExpr.X.(*ast.Ident)
-	if ok {
-		name = ident.Name
-	}
-
-	//如果在map内，直接忽略
-	if _, ok := checkObjList[name]; !ok {
-		return false
-	}
-	return true
-}
-
-func isTransactionClosed(callExpr *ast.CallExpr) bool {
-	//排除非tm|dbMgr类函数，直接忽略不检查
-	if isChecklist(callExpr) == false {
-		return false
-	}
-
-	// 检查事务关闭的常见方式
-	if isTmMethodCall(callExpr, "RollbackIfNotCommit") {
-		return true
-	}
-
-	// 检查 defer 关闭事务
-	//if isDeferTransactionClose(callExpr) {
-	//	return true
-	//}
-	return false
-}
-
-/*
-func isDeferTransactionClose(callExpr *ast.CallExpr) bool {
-	deferStmt, ok := getParentDeferStmt(callExpr)
-	if !ok {
-		return false
-	}
-
-	// 检查 defer 语句中的函数调用是否是事务关闭的方法
-	return isTransactionClosed(deferStmt.Call)
-}
-
-func getParentDeferStmt(callExpr *ast.CallExpr) (*ast.DeferStmt, bool) {
-	for _, stmt := range getContainingStmts(callExpr) {
-		if deferStmt, ok := stmt.(*ast.DeferStmt); ok {
-			return deferStmt, true
-		}
-	}
-
-	return nil, false
-}
-
-func getContainingStmts(node ast.Node) []ast.Stmt {
-	var stmts []ast.Stmt
-
-	for {
-		node = node.Parent()
-		if node == nil {
-			break
-		}
-
-		if stmt, ok := node.(ast.Stmt); ok {
-			stmts = append(stmts, stmt)
-		}
-	}
-
-	return stmts
-}*/
