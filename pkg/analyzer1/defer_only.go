@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	"go/token"
 	"golang.org/x/tools/go/analysis"
+	"golang.org/x/tools/go/analysis/passes/buildssa"
 )
 
 type deferOnlyAnalyzer struct{}
@@ -18,6 +19,11 @@ func NewDeferOnlyAnalyzer() *analysis.Analyzer {
 
 // Run implements the main analysis pass
 func (a *deferOnlyAnalyzer) Run(pass *analysis.Pass) (interface{}, error) {
+
+	_, ok := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA)
+	if !ok {
+		return nil, nil
+	}
 
 	for _, file := range pass.Files {
 		//暂定检测结构体
